@@ -2,14 +2,32 @@ import tkinter as tk
 from tkinter import messagebox
 import statistics
 
-class NotasApp:
+class Notas:
+    def __init__(self):
+        self.listaNotas = []
+    
+    def calcularPromedio(self):
+        return statistics.mean(self.listaNotas) if self.listaNotas else 0
+    
+    def calcularDesviacion(self):
+        return statistics.stdev(self.listaNotas) if len(self.listaNotas) > 1 else 0
+    
+    def calcularMayor(self):
+        return max(self.listaNotas) if self.listaNotas else 0
+    
+    def calcularMenor(self):
+        return min(self.listaNotas) if self.listaNotas else 0
+
+class VentanaPrincipal:
     def __init__(self, root):
         self.root = root
         self.root.title("Notas")
         self.root.geometry("300x300")
         self.root.resizable(False, False)
         
+        self.notas = Notas()
         self.entradas = []
+        
         for i in range(5):
             tk.Label(root, text=f"Nota {i+1}:").grid(row=i, column=0, padx=5, pady=5)
             entrada = tk.Entry(root)
@@ -24,11 +42,11 @@ class NotasApp:
     
     def calcular(self):
         try:
-            notas = [float(entrada.get()) for entrada in self.entradas]
-            promedio = statistics.mean(notas)
-            desviacion = statistics.stdev(notas) if len(notas) > 1 else 0
-            valor_max = max(notas)
-            valor_min = min(notas)
+            self.notas.listaNotas = [float(entrada.get()) for entrada in self.entradas]
+            promedio = self.notas.calcularPromedio()
+            desviacion = self.notas.calcularDesviacion()
+            valor_max = self.notas.calcularMayor()
+            valor_min = self.notas.calcularMenor()
             
             resultado = (f"Promedio = {promedio:.2f}\n"
                          f"Desviación estándar = {desviacion:.2f}\n"
@@ -43,7 +61,10 @@ class NotasApp:
             entrada.delete(0, tk.END)
         self.resultado_label.config(text="")
 
-if __name__ == "__main__":
+def main():
     root = tk.Tk()
-    app = NotasApp(root)
+    app = VentanaPrincipal(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()

@@ -2,28 +2,66 @@ import tkinter as tk
 from tkinter import messagebox
 import math
 
-class MenuPrincipal(tk.Tk):
+class FiguraGeometrica:
     def __init__(self):
+        self.volumen = 0
+        self.superficie = 0
+    
+    def setVolumen(self, volumen):
+        self.volumen = volumen
+    
+    def setSuperficie(self, superficie):
+        self.superficie = superficie
+    
+    def getVolumen(self):
+        return self.volumen
+    
+    def getSuperficie(self):
+        return self.superficie
+
+class Cilindro(FiguraGeometrica):
+    def __init__(self, radio, altura):
         super().__init__()
-        self.title("Figuras Geométricas")
-        self.geometry("400x200")
+        self.radio = radio
+        self.altura = altura
+        self.calcularVolumen()
+        self.calcularSuperficie()
+    
+    def calcularVolumen(self):
+        self.setVolumen(math.pi * self.radio**2 * self.altura)
+    
+    def calcularSuperficie(self):
+        self.setSuperficie(2 * math.pi * self.radio * (self.radio + self.altura))
 
-        tk.Label(self, text="Seleccione una figura", font=("Arial", 14)).pack(pady=10)
+class Esfera(FiguraGeometrica):
+    def __init__(self, radio):
+        super().__init__()
+        self.radio = radio
+        self.calcularVolumen()
+        self.calcularSuperficie()
+    
+    def calcularVolumen(self):
+        self.setVolumen((4/3) * math.pi * self.radio**3)
+    
+    def calcularSuperficie(self):
+        self.setSuperficie(4 * math.pi * self.radio**2)
 
-        tk.Button(self, text="Cilindro", command=self.abrir_cilindro).pack(pady=5)
-        tk.Button(self, text="Esfera", command=self.abrir_esfera).pack(pady=5)
-        tk.Button(self, text="Pirámide", command=self.abrir_piramide).pack(pady=5)
+class Piramide(FiguraGeometrica):
+    def __init__(self, base, altura, apotema):
+        super().__init__()
+        self.base = base
+        self.altura = altura
+        self.apotema = apotema
+        self.calcularVolumen()
+        self.calcularSuperficie()
+    
+    def calcularVolumen(self):
+        self.setVolumen((1/3) * self.base**2 * self.altura)
+    
+    def calcularSuperficie(self):
+        self.setSuperficie(self.base**2 + 2 * self.base * self.apotema)
 
-    def abrir_cilindro(self):
-        CilindroGUI(self)
-
-    def abrir_esfera(self):
-        EsferaGUI(self)
-
-    def abrir_piramide(self):
-        PiramideGUI(self)
-
-class CilindroGUI(tk.Toplevel):
+class VentanaCilindro(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Cilindro")
@@ -43,15 +81,12 @@ class CilindroGUI(tk.Toplevel):
 
     def calcular(self):
         try:
-            r = float(self.radio.get())
-            h = float(self.altura.get())
-            volumen = math.pi * r**2 * h
-            superficie = 2 * math.pi * r * (r + h)
-            self.resultado.config(text=f"Volumen: {volumen:.2f} cm³\nSuperficie: {superficie:.2f} cm²")
+            figura = Cilindro(float(self.radio.get()), float(self.altura.get()))
+            self.resultado.config(text=f"Volumen: {figura.getVolumen():.2f} cm³\nSuperficie: {figura.getSuperficie():.2f} cm²")
         except ValueError:
             messagebox.showerror("Error", "Ingrese valores válidos.")
 
-class EsferaGUI(tk.Toplevel):
+class VentanaEsfera(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Esfera")
@@ -67,14 +102,12 @@ class EsferaGUI(tk.Toplevel):
 
     def calcular(self):
         try:
-            r = float(self.radio.get())
-            volumen = (4/3) * math.pi * r**3
-            superficie = 4 * math.pi * r**2
-            self.resultado.config(text=f"Volumen: {volumen:.2f} cm³\nSuperficie: {superficie:.2f} cm²")
+            figura = Esfera(float(self.radio.get()))
+            self.resultado.config(text=f"Volumen: {figura.getVolumen():.2f} cm³\nSuperficie: {figura.getSuperficie():.2f} cm²")
         except ValueError:
             messagebox.showerror("Error", "Ingrese valores válidos.")
 
-class PiramideGUI(tk.Toplevel):
+class VentanaPiramide(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Pirámide")
@@ -98,15 +131,36 @@ class PiramideGUI(tk.Toplevel):
 
     def calcular(self):
         try:
-            b = float(self.base.get())
-            h = float(self.altura.get())
-            a = float(self.apotema.get())
-            volumen = (1/3) * b**2 * h
-            superficie = b**2 + 2 * b * a
-            self.resultado.config(text=f"Volumen: {volumen:.2f} cm³\nSuperficie: {superficie:.2f} cm²")
+            figura = Piramide(float(self.base.get()), float(self.altura.get()), float(self.apotema.get()))
+            self.resultado.config(text=f"Volumen: {figura.getVolumen():.2f} cm³\nSuperficie: {figura.getSuperficie():.2f} cm²")
         except ValueError:
             messagebox.showerror("Error", "Ingrese valores válidos.")
 
+class VentanaPrincipal(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Figuras Geométricas")
+        self.geometry("400x200")
+
+        tk.Label(self, text="Seleccione una figura", font=("Arial", 14)).pack(pady=10)
+        tk.Button(self, text="Cilindro", command=self.abrir_cilindro).pack(pady=5)
+        tk.Button(self, text="Esfera", command=self.abrir_esfera).pack(pady=5)
+        tk.Button(self, text="Pirámide", command=self.abrir_piramide).pack(pady=5)
+
+    def abrir_cilindro(self):
+        VentanaCilindro(self)
+
+    def abrir_esfera(self):
+        VentanaEsfera(self)
+
+    def abrir_piramide(self):
+        VentanaPiramide(self)
+
+class Principal:
+    @staticmethod
+    def ejecutar():
+        app = VentanaPrincipal()
+        app.mainloop()
+
 if __name__ == "__main__":
-    app = MenuPrincipal()
-    app.mainloop()
+    Principal.ejecutar()
